@@ -1,5 +1,11 @@
 import { createOpenAI, openai } from "@ai-sdk/openai";
-import { convertToCoreMessages, embed, streamText, tool } from "ai";
+import {
+  convertToCoreMessages,
+  embed,
+  generateText,
+  streamText,
+  tool,
+} from "ai";
 import { getXataClient } from "@/lib/xata";
 import { z } from "zod";
 
@@ -69,34 +75,43 @@ export async function POST(req: Request) {
     context,
   });
 
+  const preResult = await generateText({
+    model,
+    messages,
+    system: "Rellena información de un usuario",
+    tools: {
+      getUserProfile: tool({
+        description:
+          "Consigue información acerca de un usuario apartir de sus historial de conversaciones",
+        parameters: z.object({
+          name: z.string().describe("Nombre del usuario"),
+          social_registry_percentage: z
+            .number()
+            .min(10)
+            .max(100)
+            .describe(
+              'Porcentaje del registro social de hogares; ej.: decil o percentil 7 = 70. Otro ejemplo: "Estoy en el 60% más vulnerable = 60"'
+            ),
+          commune: z
+            .string()
+            .describe("Comuna de Chile en la que vive el usuario"),
+        }),
+        execute: async (values) => {
+          return values;
+        },
+      }),
+    },
+    toolChoice: "required",
+  });
+
+  console.log(
+    preResult.toolResults.find((t) => t.toolName === "getUserProfile")?.result
+  );
+
   const result = await streamText({
     model,
     messages,
     system,
-    tools: {},
   });
   return result.toAIStreamResponse();
-}
-
-export async function GET(req: Request) {
-  // const body = await req.json();
-
-  const xata = getXataClient();
-  const records = await xata.db.scholarships.vectorSearch(
-    "embedding",
-    await generateEmbedding("pascuense"),
-    { size: 1 }
-  );
-
-  return new Response(
-    JSON.stringify({
-      success: true,
-      records,
-    }),
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
 }
