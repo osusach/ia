@@ -94,7 +94,7 @@ export async function POST(req: Request) {
             ),
           commune: z
             .string()
-            .describe("Comuna de Chile en la que vive el usuario"),
+            .describe("Comuna de Chile en la que vive el usuario. Esta no puede ser una ubicación de otro país."),
         }),
         execute: async (values) => {
           return values;
