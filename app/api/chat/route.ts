@@ -158,8 +158,11 @@ export async function POST(req: Request) {
   );
 
   console.log(
-    preResult.toolResults.find((t) => t.toolName === "getEligibleScholarships")?.args,
-    preResult.toolResults.find((t) => t.toolName === "getEligibleScholarships")?.result.map(e => e.name)
+    preResult.toolResults.find((t) => t.toolName === "getEligibleScholarships")
+      ?.args,
+    preResult.toolResults
+      .find((t) => t.toolName === "getEligibleScholarships")
+      ?.result.map((e) => e.name)
   );
 
   const result = await streamText({
