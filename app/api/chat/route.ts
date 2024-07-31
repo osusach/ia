@@ -8,6 +8,7 @@ import {
 } from "ai";
 import { getXataClient } from "@/lib/xata";
 import { z } from "zod";
+import { getAvailableScholarships } from "@/lib/getAvailableScholarships";
 
 // const getScholarshipInformation = tool({
 //   description:
@@ -94,10 +95,58 @@ export async function POST(req: Request) {
             ),
           commune: z
             .string()
-            .describe("Comuna de Chile en la que vive el usuario. Esta no puede ser una ubicación de otro país."),
+            .describe(
+              "Comuna de Chile en la que vive el usuario. Esta no puede ser una ubicación de otro país."
+            ),
         }),
         execute: async (values) => {
           return values;
+        },
+      }),
+      getEligibleScholarships: tool({
+        description:
+          "Muestra las becas a las que podría postular el usuario, a partir de la información recolectada.",
+        parameters: z.object({
+          social_registry_percentage: z
+            .number()
+            .min(10)
+            .max(100)
+            .nullable()
+            .describe(
+              'Porcentaje del registro social de hogares; ej.: decil o percentil 7 = 70. Otro ejemplo: "Estoy en el 60% más vulnerable = 60". Si no lo sabes, el valor es null'
+            ),
+          highschool_average_score: z
+            .number()
+            .min(1)
+            .max(7)
+            .nullable()
+            .describe(
+              "Promedio de notas de enseñanza media del estudiante; Es un número flotante de un decimal, entre 1.0 y 7.0 inclusivo. Si no lo sabes, el valor es null"
+            ),
+          average_obligatory_exams_score: z
+            .number()
+            .min(150)
+            .max(1000)
+            .nullable()
+            .describe(
+              "Puntaje promedio de los exámenes de ingreso a la universidad en Chile. Es un número entero entre 150 y 1000. Si no lo sabes, el valor es null"
+            ),
+          top_ranking_percentage: z
+            .number()
+            .min(10)
+            .max(100)
+            .nullable()
+            .describe(
+              'Porcentaje del ranking de notas de la generación del estudiante; ej.: decil o percentil 7 = 70. Otro ejemplo: "Estoy en el 10% mejor de mi generación.". Si no lo sabes, el valor es null'
+            ),
+        }),
+        execute: async (values) => {
+          return getAvailableScholarships(
+            values.social_registry_percentage,
+            values.highschool_average_score,
+            values.average_obligatory_exams_score,
+            values.top_ranking_percentage
+          );
         },
       }),
     },
@@ -106,6 +155,11 @@ export async function POST(req: Request) {
 
   console.log(
     preResult.toolResults.find((t) => t.toolName === "getUserProfile")?.result
+  );
+
+  console.log(
+    preResult.toolResults.find((t) => t.toolName === "getEligibleScholarships")?.args,
+    preResult.toolResults.find((t) => t.toolName === "getEligibleScholarships")?.result.map(e => e.name)
   );
 
   const result = await streamText({
