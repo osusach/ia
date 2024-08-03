@@ -31,16 +31,22 @@ export default function Page() {
 
   return (
     <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
-      <div className="space-y-2">
+      <div className="space-y-4">
         {conversation.map((message: ClientMessage) => (
           <div
-            className={cn("whitespace-pre-wrap rounded-md p-2", {
-              "bg-stone-200": message.role === "assistant",
-              "bg-orange-500 text-stone-50": message.role === "user",
-            })}
             key={message.id}
+            className={cn({
+              "flex justify-end items-end w-full": message.role === "user",
+            })}
           >
-            {message.display}
+            <div
+              className={cn("whitespace-pre-wrap rounded-md p-2", {
+                "bg-stone-200 w-full": message.role === "assistant",
+                "bg-orange-500 text-stone-50 w-fit": message.role === "user",
+              })}
+            >
+              {message.display}
+            </div>
           </div>
         ))}
       </div>
