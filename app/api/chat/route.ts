@@ -9,6 +9,7 @@ import {
 import { getXataClient } from "@/lib/xata";
 import { z } from "zod";
 import { getAvailableScholarships } from "@/lib/getAvailableScholarships";
+import { streamUI } from "ai/rsc";
 
 // const getScholarshipInformation = tool({
 //   description:
