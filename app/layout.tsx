@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Noticia_Text } from "next/font/google";
+import { Instrument_Sans as Font } from "next/font/google";
 import "./globals.css";
 import { AI } from "./actions";
+import { cn } from "@/lib/utils";
 
-const font = Noticia_Text({ subsets: ["latin"], weight: ["400", "700"] });
+const font = Font({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={font.className}>
+      <body className={cn(font.className, "bg-stone-50 text-stone-900")}>
         <AI>{children}</AI>
       </body>
     </html>

@@ -5,6 +5,7 @@ import { ClientMessage } from "./actions";
 import { useActions, useUIState } from "ai/rsc";
 import { generateId } from "ai";
 import { ArrowUpIcon } from "@heroicons/react/16/solid";
+import { cn } from "@/lib/utils";
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -30,20 +31,28 @@ export default function Page() {
 
   return (
     <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
-      <div>
+      <div className="space-y-2">
         {conversation.map((message: ClientMessage) => (
-          <div className="whitespace-pre-wrap" key={message.id}>
-            {message.role}: {message.display}
+          <div
+            className={cn("whitespace-pre-wrap rounded-md p-2", {
+              "bg-stone-200": message.role === "assistant",
+              "bg-orange-500 text-stone-50": message.role === "user",
+            })}
+            key={message.id}
+          >
+            {message.display}
           </div>
         ))}
       </div>
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          handleSendMessage();
-          setInput("");
+          if (input.trim().length > 0) {
+            handleSendMessage();
+            setInput("");
+          }
         }}
-        className="fixed bottom-0 w-full max-w-md p-2 mb-8 flex justify-center border border-zinc-300 bg-zinc-100 rounded"
+        className="fixed bottom-0 w-full max-w-md p-2 mb-8 flex justify-center border border-stone-300 bg-stone-100 rounded"
       >
         <textarea
           rows={1.5}
@@ -60,7 +69,7 @@ export default function Page() {
         />
         <button
           type="submit"
-          className="bg-amber-500 relative text-white rounded-full h-10 w-10 shrink-0"
+          className="bg-orange-500 relative text-white rounded-full h-10 w-10 shrink-0"
         >
           <span className="absolute left-0 top-0 bottom-0 flex items-center justify-center w-full">
             <ArrowUpIcon className="h-6 w-6" />

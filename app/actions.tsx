@@ -14,24 +14,50 @@ import { ReactNode } from "react";
 import { z } from "zod";
 
 function LoadingComponent() {
-  return <div className="animate-pulse p-4">Cargando componente...</div>;
+  return (
+    <div className="bg-stone-100 grid p-2 border text-black gap-1 rounded-md animate-pulse">
+      <div>
+        <div className="w-36 h-5 bg-stone-200 rounded-lg inline-block"></div>
+        <div className="w-16 h-4 ml-1 bg-stone-200 rounded-lg inline-block"></div>
+      </div>
+      <div className="space-y-1">
+        <div className="w-[78%] h-4 bg-stone-200 rounded-lg"></div>
+        <div className="w-[92%] h-4 bg-stone-200 rounded-lg"></div>
+        <div className="w-[67%] h-4 bg-stone-200 rounded-lg"></div>
+      </div>
+      <div className="flex gap-0.5 mt-1 justify-start items-center">
+        <div className="w-6 h-6 bg-stone-200 rounded-full inline-block"></div>
+        <div className="w-36 h-5 ml-1 bg-stone-200 rounded-lg inline-block"></div>
+      </div>
+    </div>
+  );
 }
 
-function Scholarship(props: { name: string; description: string }) {
+function Scholarship(props: {
+  name: string;
+  description: string;
+  type: "complementary" | "tuition";
+}) {
+  const type =
+    props.type === "complementary" ? "Complementaria" : "Arancelaria";
   return (
-    <div className="bg-neutral-100 p-2 border text-black flex gap-1 rounded-md">
+    <div className="bg-stone-100 grid p-2 border text-black gap-1 rounded-md">
       <p>
-        <strong>{props.name}</strong>
+        <strong>{props.name}</strong> <small>({type})</small>
         <br />
         <span>{props.description}</span>
       </p>
-      <div>
+      <div className="flex gap-1 justify-start items-center">
         <img
+          style={{
+            // mixBlendMode: "color-burn",
+            filter: "grayscale(100%)",
+          }}
           className="object-contain w-6 h-6 inline-block mr-1"
           src="/usach.png"
           alt="Universidad de Santiago de Chile"
         />
-        <p className="text-neutral-500">{props.name}</p>
+        <p className="text-stone-500">Universidad de Santiago de Chile</p>
       </div>
     </div>
   );
@@ -117,6 +143,11 @@ export async function continueConversation(
           scholarships: z.array(
             z.object({
               name: z.string().describe("Nombre de la beca"),
+              type: z
+                .enum(["complementary", "tuition"])
+                .describe(
+                  'Tipo de beca, "tuition" se refiere a la beca de toda beca que cubra arancel, de lo contrario es "complementary"'
+                ),
               description: z.string().describe("Descripción de la beca"),
             })
           ),
